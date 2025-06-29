@@ -237,23 +237,6 @@ fig_tt_cost = px.bar(
 )
 st.plotly_chart(fig_tt_cost)
 
-# Impacto Econômico (Dias Perdidos) por Tipo de Tratamento
-df_tt_burden = df_filtered.groupby("treatment_type")["economic_burden_lost_workdays_per_year"].mean().reset_index()
-
-fig_tt_burden = px.bar(
-    df_tt_burden,
-    x="treatment_type",
-    y="economic_burden_lost_workdays_per_year",
-    color="treatment_type",
-    title="Média de Dias de Trabalho Perdidos por Tipo de Tratamento",
-    labels={
-        "economic_burden_lost_workdays_per_year": "Dias Perdidos/Ano",
-        "treatment_type": "Tipo de Tratamento"
-    },
-    template="simple_white"
-)
-st.plotly_chart(fig_tt_burden)
-
 st.subheader("Custo vs. Dias de Trabalho Perdidos")
 
 df_corr = df_filtered[[
@@ -262,11 +245,15 @@ df_corr = df_filtered[[
     "treatment_type"
 ]].dropna()
 
+# Paleta cores
+custom_colors = ["#1f77b4", "#636363", "#2ca02c", "#7f7f7f", "#17becf", "#8c8c8c"]
+
 fig_corr_simple = px.scatter(
     df_corr,
     x="cost_of_treatment_usd",
     y="economic_burden_lost_workdays_per_year",
     color="treatment_type",
+    color_discrete_sequence=custom_colors,
     title="Custo vs. Dias de Trabalho Perdidos por Tipo de Tratamento",
     labels={
         "cost_of_treatment_usd": "Custo do Tratamento (USD)",
@@ -274,16 +261,17 @@ fig_corr_simple = px.scatter(
         "treatment_type": "Tipo de Tratamento"
     },
     template="simple_white",
-    opacity=0.7
+    opacity=0.8
 )
 
 st.plotly_chart(fig_corr_simple)
+
 
 # ===============================
 # Informações sobre o Dataset
 # ===============================
 st.markdown("---")
-st.markdown("### 📁 Informações sobre o Dataset")
+st.markdown("### Informações sobre o Dataset")
 
 st.markdown("""
 - **Nome:** Oral Cancer Prediction Dataset  
