@@ -11,7 +11,7 @@ def load_data():
     
     # Renomear colunas problemáticas (com % e parênteses)
     df.rename(columns={
-        "survival_rate_5_year_%": "survival_rate_5_year_pct",
+        "survival_rate_(5-year_%)": "survival_rate_5_year_pct",
         "oral_cancer_(diagnosis)": "oral_cancer_diagnosis"
     }, inplace=True)
     
