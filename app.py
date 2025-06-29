@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -94,20 +93,26 @@ fig_surv = px.violin(
     color="gender",
     title="Taxa de Sobrevivência por Sexo",
     labels={"survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
-    template="seaborn"
+    template="simple_white"
 )
 st.plotly_chart(fig_surv)
 
 st.subheader("Taxa de Sobrevivência por Idade")
+df_age_plot = df_filtered[["age", "survival_rate_5_year_pct", "gender"]].dropna()
+df_age_plot = df_age_plot[
+    df_age_plot["age"].apply(lambda x: isinstance(x, (int, float))) &
+    df_age_plot["survival_rate_5_year_pct"].apply(lambda x: isinstance(x, (int, float)))
+]
+
 fig_age = px.scatter(
-    df_filtered,
+    df_age_plot,
     x="age",
     y="survival_rate_5_year_pct",
     color="gender",
     title="Taxa de Sobrevivência vs Idade",
     labels={"survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
     trendline="ols",
-    template="plotly_dark"
+    template="simple_white"
 )
 st.plotly_chart(fig_age)
 
@@ -131,11 +136,11 @@ fig_map = px.choropleth(
     country_counts,
     locations="country",
     locationmode="country names",
-    color="cases",
+    color="cases", color_continuous_midpoint=country_counts["cases"].mean(),
     hover_name="country",
-    color_continuous_scale="Viridis",
+    color_continuous_scale="Blues",
     title="Distribuição Global de Casos de Câncer Oral",
-    template="plotly",
+    template="simple_white",
     projection="natural earth"
 )
 fig_map.update_geos(
@@ -144,6 +149,7 @@ fig_map.update_geos(
     showlakes=True, lakecolor="lightblue"
 )
 st.plotly_chart(fig_map, use_container_width=True)
+
 
 
 
