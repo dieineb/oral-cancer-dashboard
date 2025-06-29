@@ -8,13 +8,6 @@ import plotly.express as px
 @st.cache_data
 def load_data():
     df = pd.read_csv("oral_cancer_prediction_dataset.csv")
-    
-    # Renomear colunas problemáticas (com % e parênteses)
-    df.rename(columns={
-        "survival_rate_(5-year_%)": "survival_rate_5_year_pct",
-        "oral_cancer_(diagnosis)": "oral_cancer_diagnosis"
-    }, inplace=True)
-    
     return df
 
 df = load_data()
@@ -46,7 +39,7 @@ country_counts = df_filtered["country"].value_counts().reset_index()
 country_counts.columns = ["country", "count"]
 fig1 = px.bar(country_counts, x="country", y="count", title="Casos por País", color="count")
 st.plotly_chart(fig1)
-'''
+
 # Gráfico: Idade vs Sobrevivência
 st.subheader("Idade vs Taxa de Sobrevivência")
 fig2 = px.scatter(
@@ -58,7 +51,7 @@ fig2 = px.scatter(
     title="Idade vs Taxa de Sobrevivência (5 anos)"
 )
 st.plotly_chart(fig2)
-'''
+
 # Mapa: Casos por País
 st.subheader("Mapa Interativo: Casos por País")
 fig3 = px.choropleth(
