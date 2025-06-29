@@ -26,6 +26,73 @@ with st.sidebar:
         "Sexo",
         options=["Todos"] + sorted(df["gender"].dropna().unique().tolist())
     )
+    
+# ===============================
+# Análise Econômica e Clínica dos Tratamentos
+# ===============================
+st.subheader("Análise Econômica e Clínica dos Tratamentos")
+
+#Distribuição dos Tipos de Tratamento
+fig_tt = px.histogram(
+    df_filtered,
+    x="treatment_type",
+    color="treatment_type",
+    title="Tipos de Tratamento",
+    labels={"treatment_type": "Tipo de Tratamento"},
+    template="simple_white"
+)
+st.plotly_chart(fig_tt)
+
+# Custo Médio por Tipo de Tratamento
+df_tt_cost = df_filtered.groupby("treatment_type")["cost_of_treatment_usd"].mean().reset_index()
+
+fig_tt_cost = px.bar(
+    df_tt_cost,
+    x="treatment_type",
+    y="cost_of_treatment_usd",
+    color="treatment_type",
+    title="Custo Médio (USD) por Tipo de Tratamento",
+    labels={
+        "cost_of_treatment_usd": "Custo Médio (USD)",
+        "treatment_type": "Tipo de Tratamento"
+    },
+    template="simple_white"
+)
+st.plotly_chart(fig_tt_cost)
+
+# Impacto Econômico (Dias Perdidos) por Tipo de Tratamento
+df_tt_burden = df_filtered.groupby("treatment_type")["economic_burden_lost_workdays_per_year"].mean().reset_index()
+
+fig_tt_burden = px.bar(
+    df_tt_burden,
+    x="treatment_type",
+    y="economic_burden_lost_workdays_per_year",
+    color="treatment_type",
+    title="Média de Dias de Trabalho Perdidos por Tipo de Tratamento",
+    labels={
+        "economic_burden_lost_workdays_per_year": "Dias Perdidos/Ano",
+        "treatment_type": "Tipo de Tratamento"
+    },
+    template="simple_white"
+)
+st.plotly_chart(fig_tt_burden)
+
+# Correlação: Custo vs. Dias de Trabalho Perdidos
+fig_corr2 = px.scatter(
+    df_filtered,
+    x="cost_of_treatment_usd",
+    y="economic_burden_lost_workdays_per_year",
+    color="treatment_type",
+    title="Custo vs. Dias de Trabalho Perdidos por Tipo de Tratamento",
+    labels={
+        "cost_of_treatment_usd": "Custo do Tratamento (USD)",
+        "economic_burden_lost_workdays_per_year": "Dias Perdidos por Ano",
+        "treatment_type": "Tipo de Tratamento"
+    },
+    template="simple_white"
+)
+st.plotly_chart(fig_corr2)
+
 
     selected_country = st.selectbox(
         "País",
