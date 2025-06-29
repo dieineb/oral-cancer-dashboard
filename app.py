@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from io import StringIO
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
 
 # ===============================
 # Carregar e padronizar os dados
@@ -20,11 +17,23 @@ def load_data():
 df = load_data()
 
 # ===============================
-# Filtros laterais
+# Filtros laterais 
 # ===============================
-st.sidebar.title("Filtros")
-selected_gender = st.sidebar.multiselect("Sexo", options=df["gender"].unique(), default=df["gender"].unique())
-selected_country = st.sidebar.multiselect("País", options=df["country"].unique(), default=df["country"].unique())
+with st.sidebar:
+    st.header("Filtros disponíveis")
+    st.markdown("Utilize os filtros abaixo para refinar os dados exibidos no dashboard:")
+
+    selected_gender = st.multiselect(
+        "Sexo",
+        options=df["gender"].dropna().unique(),
+        default=df["gender"].dropna().unique()
+    )
+
+    selected_country = st.multiselect(
+        "País",
+        options=df["country"].dropna().unique(),
+        default=df["country"].dropna().unique()
+    )
 
 # Aplicar filtros
 df_filtered = df[
@@ -37,7 +46,7 @@ df_filtered = df[
 # ===============================
 st.title("Dashboard de Predição de Câncer Oral")
 
-tabs = st.tabs(["Visão Geral", "Visualizações", "Mapa", "Modelo Preditivo"])
+tabs = st.tabs(["Visão Geral", "Visualizações", "Mapa"])
 
 # === Aba 1: Visão Geral ===
 with tabs[0]:
@@ -110,44 +119,26 @@ with tabs[2]:
         locationmode="country names",
         color="cases",
         hover_name="country",
-        color_continuous_scale="blues",
-        title="Casos por País",
-        template="plotly_dark",
+        color_continuous_scale="Viridis",
+        title="Distribuição Global de Casos de Câncer Oral",
+        template="plotly_white",
         projection="natural earth"
     )
 
-    fig_map.update_geos(showcoastlines=True, coastlinecolor="white", showland=True, landcolor="rgb(240,240,240)")
-    fig_map.update_layout(margin={"r":0,"t":50,"l":0,"b":0})
-    st.plotly_chart(fig_map, use_container_width=True)
-
-# === Aba 4: Modelo Preditivo ===
-with tabs[3]:
-    st.subheader("Modelo Preditivo - Regressão Logística")
-
-    df_model = df.copy()
-    df_model["oral_cancer_diagnosis"] = df_model["oral_cancer_diagnosis"].map({"Healthy": 0, "Cancer": 1})
-
-    features = ["age", "tobacco_use", "alcohol_consumption", "hpv_infection"]
-    X = df_model[features]
-    y = df_model["oral_cancer_diagnosis"]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-
-    report = classification_report(y_test, y_pred, output_dict=False)
-    st.text(report)
-
-    # Download do relatório
-    report_buffer = StringIO()
-    report_buffer.write(report)
-    st.download_button(
-        label="Baixar Relatório do Modelo (TXT)",
-        data=report_buffer.getvalue(),
-        file_name="relatorio_modelo.txt",
-        mime="text/plain"
+    fig_map.update_geos(
+        showcoastlines=True,
+        coastlinecolor="gray",
+        showland=True,
+        landcolor="rgb(245, 245, 245)",
+        showlakes=True,
+        lakecolor="lightblue"
     )
+
+    fig_map.update_layout(
+        title_font_size=20,
+        margin=dict(r=0, t=60, l=0, b=0)
+    )
+
+    st.plotly_chart(fig_map, use_container_width=True)
 
 
