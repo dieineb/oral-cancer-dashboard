@@ -255,19 +255,39 @@ fig_tt_burden = px.bar(
 st.plotly_chart(fig_tt_burden)
 
 # Correlação: Custo vs. Dias de Trabalho Perdidos
-fig_corr2 = px.scatter(
-    df_filtered,
+st.subheader("Custo vs. Dias Perdidos (com Bubble Chart)")
+
+# Filtrar para evitar NaNs
+df_bubble = df_filtered[[
+    "cost_of_treatment_usd",
+    "economic_burden_lost_workdays_per_year",
+    "treatment_type",
+    "survival_rate_5_year_pct"
+]].dropna()
+
+# Paleta personalizada
+custom_palette = px.colors.qualitative.Set2  # ou D3, G10, T10, etc.
+
+fig_bubble = px.scatter(
+    df_bubble,
     x="cost_of_treatment_usd",
     y="economic_burden_lost_workdays_per_year",
+    size="survival_rate_5_year_pct",
     color="treatment_type",
-    title="Custo vs. Dias de Trabalho Perdidos por Tipo de Tratamento",
+    color_discrete_sequence=custom_palette,
+    hover_data=["survival_rate_5_year_pct"],
+    title="Custo vs. Dias de Trabalho Perdidos (Bubble Chart)",
     labels={
         "cost_of_treatment_usd": "Custo do Tratamento (USD)",
         "economic_burden_lost_workdays_per_year": "Dias Perdidos por Ano",
+        "survival_rate_5_year_pct": "Taxa de Sobrevivência (%)",
         "treatment_type": "Tipo de Tratamento"
     },
-    template="simple_white"
+    template="simple_white",
+    size_max=40
 )
-st.plotly_chart(fig_corr2)
+
+st.plotly_chart(fig_bubble)
+
 
 
