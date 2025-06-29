@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from io import BytesIO, StringIO
+from io import StringIO
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
@@ -46,7 +46,6 @@ with tabs[0]:
     diagnóstico e taxas de sobrevivência.  
     Utilize os filtros na barra lateral para refinar os dados apresentados.
     """)
-
     st.dataframe(df_filtered.head(10))
 
 # === Aba 2: Visualizações ===
@@ -61,14 +60,12 @@ with tabs[1]:
     )
     st.plotly_chart(fig_diag)
 
-    # Botão para download do gráfico (Diagnóstico)
-    buffer = BytesIO()
-    fig_diag.write_image(buffer, format="png")
+    html_diag = fig_diag.to_html().encode("utf-8")
     st.download_button(
-        label="📥 Baixar Gráfico de Diagnóstico (PNG)",
-        data=buffer.getvalue(),
-        file_name="grafico_diagnostico.png",
-        mime="image/png"
+        label="Baixar Gráfico de Diagnóstico (HTML)",
+        data=html_diag,
+        file_name="grafico_diagnostico.html",
+        mime="text/html"
     )
 
     st.subheader("Distribuição por Estágio do Câncer")
@@ -81,14 +78,12 @@ with tabs[1]:
     )
     st.plotly_chart(fig_stage)
 
-    # Botão para download do gráfico (Estágio)
-    buffer2 = BytesIO()
-    fig_stage.write_image(buffer2, format="png")
+    html_stage = fig_stage.to_html().encode("utf-8")
     st.download_button(
-        label="📥 Baixar Gráfico de Estágios (PNG)",
-        data=buffer2.getvalue(),
-        file_name="grafico_estagios.png",
-        mime="image/png"
+        label="Baixar Gráfico de Estágios (HTML)",
+        data=html_stage,
+        file_name="grafico_estagios.html",
+        mime="text/html"
     )
 
     st.subheader("Taxa de Sobrevivência em 5 Anos")
@@ -145,15 +140,14 @@ with tabs[3]:
     report = classification_report(y_test, y_pred, output_dict=False)
     st.text(report)
 
-    # Botão de download do relatório
+    # Download do relatório
     report_buffer = StringIO()
     report_buffer.write(report)
     st.download_button(
-        label="📥 Baixar Relatório do Modelo",
+        label="Baixar Relatório do Modelo (TXT)",
         data=report_buffer.getvalue(),
         file_name="relatorio_modelo.txt",
         mime="text/plain"
     )
-
 
 
