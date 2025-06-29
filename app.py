@@ -237,35 +237,28 @@ fig_tt_cost = px.bar(
 )
 st.plotly_chart(fig_tt_cost)
 
-st.subheader("Custo vs. Dias de Trabalho Perdidos")
+st.subheader("Custo Médio por Faixa Etária")
 
-df_corr = df_filtered[[
-    "cost_of_treatment_usd",
-    "economic_burden_lost_workdays_per_year",
-    "treatment_type"
-]].dropna()
+# Criar faixas etárias
+df_age_cost = df_filtered.dropna(subset=["age", "cost_of_treatment_usd"])
+df_age_cost["faixa_etaria"] = pd.cut(df_age_cost["age"], bins=[0, 30, 45, 60, 75, 90, 120],
+                                     labels=["0-30", "31-45", "46-60", "61-75", "76-90", "91+"])
 
-# Paleta cores
-custom_colors = ["#1f77b4", "#636363", "#2ca02c", "#7f7f7f", "#17becf", "#8c8c8c"]
+df_avg_cost_age = df_age_cost.groupby("faixa_etaria")["cost_of_treatment_usd"].mean().reset_index()
 
-fig_corr_simple = px.scatter(
-    df_corr,
-    x="cost_of_treatment_usd",
-    y="economic_burden_lost_workdays_per_year",
-    color="treatment_type",
-    color_discrete_sequence=custom_colors,
-    title="Custo vs. Dias de Trabalho Perdidos por Tipo de Tratamento",
+fig_line_age_cost = px.line(
+    df_avg_cost_age,
+    x="faixa_etaria",
+    y="cost_of_treatment_usd",
+    title="Custo Médio por Faixa Etária",
     labels={
-        "cost_of_treatment_usd": "Custo do Tratamento (USD)",
-        "economic_burden_lost_workdays_per_year": "Dias Perdidos por Ano",
-        "treatment_type": "Tipo de Tratamento"
+        "faixa_etaria": "Faixa Etária",
+        "cost_of_treatment_usd": "Custo Médio (USD)"
     },
-    template="simple_white",
-    opacity=0.8
+    markers=True,
+    template="simple_white"
 )
-
-st.plotly_chart(fig_corr_simple)
-
+st.plotly_chart(fig_line_age_cost)
 
 # ===============================
 # Informações sobre o Dataset
