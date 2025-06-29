@@ -1,70 +1,62 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
-
-st.set_page_config(page_title="Dashboard - Câncer Oral", layout="wide")
-
-st.title("🧪 Dashboard: Predição de Câncer Oral")
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("oral_cancer_prediction_dataset.csv")
-    return df
+    # CSV já com colunas padronizadas manualmente
+    return pd.read_csv("oral_cancer_prediction_dataset.csv")
 
 df = load_data()
 
-st.sidebar.header("🔍 Filtros")
-selected_gender = st.sidebar.multiselect("Sexo", options=df["Gender"].dropna().unique(), default=df["Gender"].dropna().unique())
-selected_country = st.sidebar.multiselect("País", options=df["Country"].dropna().unique(), default=df["Country"].dropna().unique())
+st.title("Dashboard de Predição de Câncer Oral")
+st.markdown("Este dashboard interativo permite explorar os dados relacionados aos fatores de risco e diagnósticos de câncer oral.")
 
-df_filtered = df[(df["Gender"].isin(selected_gender)) & (df["Country"].isin(selected_country))]
+# Sidebar
+st.sidebar.header("Filtros")
+selected_gender = st.sidebar.multiselect("Sexo", options=df["gender"].unique(), default=df["gender"].unique())
+selected_country = st.sidebar.multiselect("País", options=df["country"].unique(), default=df["country"].unique())
 
-st.subheader("📊 Amostra dos Dados")
-st.dataframe(df_filtered.head())
+df_filtered = df[
+    (df["gender"].isin(selected_gender)) &
+    (df["country"].isin(selected_country))
+]
 
-st.subheader("📈 Distribuição de Idade por Diagnóstico")
-fig1 = px.histogram(df_filtered, x="Age", color="Oral Cancer (Diagnosis)", barmode="overlay", nbins=30)
-st.plotly_chart(fig1, use_container_width=True)
+# Métricas
+st.subheader("Visão Geral dos Dados")
+col1, col2, col3 = st.columns(3)
+col1.metric("Total de Registros", f"{df_filtered.shape[0]:,}")
+col2.metric("Países", df_filtered["country"].nunique())
+col3.metric("Média de Idade", f"{df_filtered['age'].mean():.1f}")
 
-st.subheader("🚬 Uso de Tabaco e Diagnóstico")
-fig2 = px.histogram(df_filtered, x="Tobacco Use", color="Oral Cancer (Diagnosis)")
-st.plotly_chart(fig2, use_container_width=True)
+# Gráfico: Casos por País
+st.subheader("Distribuição de Casos por País")
+country_counts = df_filtered["country"].value_counts().reset_index()
+country_counts.columns = ["country", "count"]
+fig1 = px.bar(country_counts, x="country", y="count", title="Casos por País", color="count")
+st.plotly_chart(fig1)
 
-st.subheader("🗺️ Mapa Interativo por País")
-map_data = df.groupby("Country")["Oral Cancer (Diagnosis)"].value_counts().unstack().fillna(0)
-map_data["Total"] = map_data.sum(axis=1)
-map_data["% Câncer Oral"] = (map_data[1] / map_data["Total"]) * 100
-map_data.reset_index(inplace=True)
-
-fig_map = px.choropleth(
-    map_data,
-    locations="Country",
-    locationmode="country names",
-    color="% Câncer Oral",
-    hover_name="Country",
-    color_continuous_scale="Reds",
-    title="% de Casos Positivos de Câncer Oral por País"
+# Gráfico: Idade vs Sobrevivência
+st.subheader("Idade vs Taxa de Sobrevivência")
+fig2 = px.scatter(
+    df_filtered,
+    x="age",
+    y="survival_rate_5_year_pct",
+    color="oral_cancer_diagnosis",
+    hover_data=["country", "gender"],
+    title="Idade vs Taxa de Sobrevivência (5 anos)"
 )
-st.plotly_chart(fig_map, use_container_width=True)
+st.plotly_chart(fig2)
 
-st.subheader("🤖 Modelo de Regressão Logística")
+# Mapa: Casos por País
+st.subheader("Mapa Interativo: Casos por País")
+fig3 = px.choropleth(
+    country_counts,
+    locations="country",
+    locationmode="country names",
+    color="count",
+    color_continuous_scale="Reds",
+    title="Distribuição de Casos por País"
+)
+st.plotly_chart(fig3)
 
-if st.checkbox("Rodar modelo preditivo"):
-    features = ["Age", "Tobacco Use", "Alcohol Consumption", "HPV Infection", "Betel Quid Use"]
-    model_df = df_filtered[features + ["Oral Cancer (Diagnosis)"]].dropna()
-    model_df = pd.get_dummies(model_df, drop_first=True)
-
-    X = model_df.drop("Oral Cancer (Diagnosis)", axis=1)
-    y = model_df["Oral Cancer (Diagnosis)"]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-
-    st.text("Relatório de Classificação:")
-    st.text(classification_report(y_test, y_pred))
