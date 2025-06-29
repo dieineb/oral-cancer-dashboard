@@ -254,40 +254,50 @@ fig_tt_burden = px.bar(
 )
 st.plotly_chart(fig_tt_burden)
 
-# Correlação: Custo vs. Dias de Trabalho Perdidos
-st.subheader("Custo vs. Dias Perdidos (com Bubble Chart)")
+st.subheader("Custo vs. Dias de Trabalho Perdidos")
 
-# Filtrar para evitar NaNs
-df_bubble = df_filtered[[
+df_corr = df_filtered[[
     "cost_of_treatment_usd",
     "economic_burden_lost_workdays_per_year",
-    "treatment_type",
-    "survival_rate_5_year_pct"
+    "treatment_type"
 ]].dropna()
 
-# Paleta personalizada
-custom_palette = px.colors.qualitative.Set2  # ou D3, G10, T10, etc.
-
-fig_bubble = px.scatter(
-    df_bubble,
+fig_corr_simple = px.scatter(
+    df_corr,
     x="cost_of_treatment_usd",
     y="economic_burden_lost_workdays_per_year",
-    size="survival_rate_5_year_pct",
     color="treatment_type",
-    color_discrete_sequence=custom_palette,
-    hover_data=["survival_rate_5_year_pct"],
-    title="Custo vs. Dias de Trabalho Perdidos (Bubble Chart)",
+    title="Custo vs. Dias de Trabalho Perdidos por Tipo de Tratamento",
     labels={
         "cost_of_treatment_usd": "Custo do Tratamento (USD)",
         "economic_burden_lost_workdays_per_year": "Dias Perdidos por Ano",
-        "survival_rate_5_year_pct": "Taxa de Sobrevivência (%)",
         "treatment_type": "Tipo de Tratamento"
     },
     template="simple_white",
-    size_max=40
+    opacity=0.7
 )
 
-st.plotly_chart(fig_bubble)
+st.plotly_chart(fig_corr_simple)
 
+# ===============================
+# Informações sobre o Dataset
+# ===============================
+st.markdown("---")
+st.markdown("### 📁 Informações sobre o Dataset")
 
+st.markdown("""
+- **Nome:** Oral Cancer Prediction Dataset  
+- **Fonte:** Kaggle ([link](https://www.kaggle.com/datasets/ankushpanday2/oral-cancer-prediction-dataset))  
+- **Cobertura Temporal:**  
+  - Início: **08 de agosto de 2018**  
+  - Fim: **01 de fevereiro de 2024**  
+- **Cobertura Geográfica:** Mundial 🌍  
+- **Descrição:** Conjunto de dados contendo informações clínicas, demográficas e econômicas relacionadas ao câncer oral. As variáveis incluem:
+  - Idade, sexo, país
+  - Estágio do câncer e tipo de tratamento
+  - Custo do tratamento em dólares (USD)
+  - Taxa de sobrevivência em 5 anos (%)
+  - Impacto econômico (dias de trabalho perdidos por ano)
 
+- **Objetivo:** Permitir análises exploratórias e preditivas voltadas à compreensão dos fatores de risco, impacto econômico e desfechos clínicos do câncer oral.
+""")
