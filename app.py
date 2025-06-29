@@ -145,16 +145,20 @@ fig_map.update_layout(
 
 st.plotly_chart(fig_map, use_container_width=True)
 
-
 st.subheader("Análise por Grupos de Fatores de Risco")
 
 def plot_group(title, factor_list, color):
-    risk_counts = df_filtered[factor_list].apply(lambda col: (col == "Yes").sum()).sort_values()
+    # Contagem absoluta e percentual
+    risk_counts = df_filtered[factor_list].apply(lambda col: (col == "Yes").sum())
+    percentuais = risk_counts / len(df_filtered) * 100
+
     df_group = pd.DataFrame({
-        "Fator de Risco": risk_counts.index,
-        "Casos com Presença": risk_counts.values
+        "Fator de Risco": risk_counts.index.str.replace('_', ' ').str.title(),
+        "Casos com Presença": risk_counts.values,
+        "Percentual": percentuais.values
     })
 
+    # Criar gráfico sem texto fixo, apenas hover
     fig = px.bar(
         df_group,
         x="Casos com Presença",
@@ -162,10 +166,21 @@ def plot_group(title, factor_list, color):
         orientation="h",
         color_discrete_sequence=[color],
         template="simple_white",
-        title=title
+        title=title,
+        hover_data={
+            "Casos com Presença": True,
+            "Percentual": ':.1f',
+            "Fator de Risco": False  # já está no eixo Y
+        }
     )
-    fig.update_layout(yaxis=dict(categoryorder='total ascending'))
-    st.plotly_chart(fig)
+
+    fig.update_layout(
+        yaxis=dict(categoryorder='total ascending'),
+        hoverlabel=dict(bgcolor="white", font_size=12),
+        showlegend=False
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 # Estilo de Vida
 plot_group("Estilo de Vida", [
