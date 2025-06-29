@@ -2,12 +2,23 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# ===============================
+# Carregar e padronizar os dados
+# ===============================
 @st.cache_data
 def load_data():
-    # CSV já com colunas padronizadas manualmente
-    return pd.read_csv("oral_cancer_prediction_dataset.csv")
+    df = pd.read_csv("oral_cancer_prediction_dataset.csv")
+    
+    # Renomear colunas problemáticas (com % e parênteses)
+    df.rename(columns={
+        "survival_rate_5_year_%": "survival_rate_5_year_pct",
+        "oral_cancer_(diagnosis)": "oral_cancer_diagnosis"
+    }, inplace=True)
+    
+    return df
 
 df = load_data()
+
 
 st.title("Dashboard de Predição de Câncer Oral")
 st.markdown("Este dashboard interativo permite explorar os dados relacionados aos fatores de risco e diagnósticos de câncer oral.")
@@ -41,8 +52,8 @@ st.subheader("Idade vs Taxa de Sobrevivência")
 fig2 = px.scatter(
     df_filtered,
     x="age",
-    y="survival_rate_5_year_%",
-    color="oral_cancer_(diagnosis)",
+    y="survival_rate_5_year_pct",
+    color="oral_cancer_diagnosis",
     hover_data=["country", "gender"],
     title="Idade vs Taxa de Sobrevivência (5 anos)"
 )
