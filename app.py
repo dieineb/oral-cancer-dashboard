@@ -144,7 +144,6 @@ fig_map.update_layout(
 )
 
 st.plotly_chart(fig_map, use_container_width=True)
-
 st.subheader("Análise por Grupos de Fatores de Risco")
 
 def plot_group(title, factor_list, color):
@@ -155,10 +154,10 @@ def plot_group(title, factor_list, color):
     df_group = pd.DataFrame({
         "Fator de Risco": risk_counts.index.str.replace('_', ' ').str.title(),
         "Casos com Presença": risk_counts.values,
-        "Percentual": percentuais.values
+        "Percentual (%)": percentuais.values
     })
 
-    # Criar gráfico sem texto fixo, apenas hover
+    # Gráfico com hover visível e legível
     fig = px.bar(
         df_group,
         x="Casos com Presença",
@@ -169,14 +168,17 @@ def plot_group(title, factor_list, color):
         title=title,
         hover_data={
             "Casos com Presença": True,
-            "Percentual": ':.1f',
-            "Fator de Risco": False  # já está no eixo Y
+            "Percentual (%)": ':.1f',
+            "Fator de Risco": False
         }
     )
 
     fig.update_layout(
         yaxis=dict(categoryorder='total ascending'),
-        hoverlabel=dict(bgcolor="white", font_size=12),
+        hoverlabel=dict(
+            bgcolor="rgba(255,255,255,0.95)",  # fundo claro
+            font=dict(color="black", size=12)
+        ),
         showlegend=False
     )
 
@@ -201,5 +203,4 @@ plot_group("Exposição Ambiental", [
 plot_group("Sinais Clínicos", [
     "oral_lesions", "unexplained_bleeding", "difficulty_swallowing", "white_or_red_patches_in_mouth"
 ], "#AB63FA")
-
 
