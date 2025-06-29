@@ -56,8 +56,6 @@ col1.metric("Total de Registros", total_registros)
 col2.metric("Idade Média", f"{media_idade:.1f} anos")
 col3.metric("Países Representados", num_paises)
 
-st.markdown("---")
-
 # ===============================
 # Visualizações
 # ===============================
@@ -65,10 +63,10 @@ st.subheader("Distribuição dos Diagnósticos de Câncer Oral")
 fig_diag = px.histogram(
     df_filtered,
     x="oral_cancer_diagnosis",
-    color="oral_cancer_diagnosis",
+    color_discrete_sequence=["#636EFA"],
     title="Diagnóstico",
     labels={"oral_cancer_diagnosis": "Diagnóstico"},
-    template="plotly_white"
+    template="simple_white"
 )
 st.plotly_chart(fig_diag)
 
@@ -76,21 +74,19 @@ st.subheader("Distribuição por Estágio do Câncer")
 fig_stage = px.histogram(
     df_filtered,
     x="cancer_stage",
-    color="cancer_stage",
+    color_discrete_sequence=["#EF553B"],
     title="Estágios do Câncer Oral",
     labels={"cancer_stage": "Estágio"},
-    template="ggplot2"
+    template="simple_white"
 )
 st.plotly_chart(fig_stage)
 
 st.subheader("Taxa de Sobrevivência por Sexo")
-fig_surv = px.violin(
+fig_surv = px.box(
     df_filtered,
-    y="survival_rate_5_year_pct",
     x="gender",
-    box=True,
-    points="all",
-    color="gender",
+    y="survival_rate_5_year_pct",
+    color_discrete_sequence=["#AB63FA"],
     title="Taxa de Sobrevivência por Sexo",
     labels={"survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
     template="simple_white"
@@ -98,37 +94,25 @@ fig_surv = px.violin(
 st.plotly_chart(fig_surv)
 
 st.subheader("Taxa de Sobrevivência por Idade")
-df_age_plot = df_filtered[["age", "survival_rate_5_year_pct", "gender"]].dropna()
-df_age_plot = df_age_plot[
-    df_age_plot["age"].apply(lambda x: isinstance(x, (int, float))) &
-    df_age_plot["survival_rate_5_year_pct"].apply(lambda x: isinstance(x, (int, float)))
-]
+df_age_plot = df_filtered[["age", "survival_rate_5_year_pct", "cancer_stage"]].dropna()
+df_age_plot = df_age_plot[df_age_plot["age"].apply(lambda x: isinstance(x, (int, float)))]
 
 fig_age = px.scatter(
     df_age_plot,
     x="age",
     y="survival_rate_5_year_pct",
-    color="gender",
-    title="Taxa de Sobrevivência vs Idade",
-    labels={"survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
-    trendline="ols",
+    color_discrete_sequence=["#00CC96"],
+    title="Taxa de Sobrevivência por Idade",
+    labels={"age": "Idade", "survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
     template="simple_white"
 )
 st.plotly_chart(fig_age)
 
-st.subheader("Taxa de Sobrevivência por Estágio do Câncer")
-fig_surv_stage = px.box(
-    df_filtered,
-    x="cancer_stage",
-    y="survival_rate_5_year_pct",
-    color="cancer_stage",
-    title="Taxa de Sobrevivência por Estágio do Câncer",
-    labels={"survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
-    template="simple_white"
-)
-st.plotly_chart(fig_surv_stage)
-
+# ===============================
+# Mapa
+# ===============================
 st.subheader("Distribuição Geográfica dos Casos")
+
 country_counts = df_filtered["country"].value_counts().reset_index()
 country_counts.columns = ["country", "cases"]
 
@@ -136,18 +120,29 @@ fig_map = px.choropleth(
     country_counts,
     locations="country",
     locationmode="country names",
-    color="cases", color_continuous_midpoint=country_counts["cases"].mean(),
+    color="cases",
     hover_name="country",
-    color_continuous_scale="Blues",
-    title="Distribuição Global de Casos de Câncer Oral",
+    color_continuous_scale="GnBu",
     template="simple_white",
-    projection="natural earth"
+    projection="natural earth",
+    title="Distribuição Global de Casos de Câncer Oral",
+    color_continuous_midpoint=country_counts["cases"].mean()
 )
+
 fig_map.update_geos(
-    showcoastlines=True, coastlinecolor="gray",
-    showland=True, landcolor="white",
-    showlakes=True, lakecolor="lightblue"
+    showcoastlines=True,
+    coastlinecolor="gray",
+    showland=True,
+    landcolor="rgb(245, 245, 245)",
+    showlakes=True,
+    lakecolor="lightblue"
 )
+
+fig_map.update_layout(
+    title_font_size=20,
+    margin=dict(r=0, t=60, l=0, b=0)
+)
+
 st.plotly_chart(fig_map, use_container_width=True)
 
 
