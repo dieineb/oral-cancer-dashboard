@@ -27,4 +27,4 @@ streamlit run app.py
 
 1. Envie os arquivos para um repositório GitHub.
 2. Acesse [https://streamlit.io/cloud](https://streamlit.io/cloud).
-3. Conecte ao repositório e publique seu app!
+3. Conecte ao repositório e publique o APP.
