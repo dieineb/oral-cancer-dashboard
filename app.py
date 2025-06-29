@@ -148,6 +148,55 @@ st.plotly_chart(fig_map, use_container_width=True)
 st.subheader("Análise por Grupos de Fatores de Risco")
 
 def plot_group(title, factor_list, color):
+    # Calcular número de casos "Yes" e percentual sobre total filtrado
+    risk_counts = df_filtered[factor_list].apply(lambda col: (col == "Yes").sum())
+    percentuais = risk_counts / len(df_filtered) * 100
+
+    df_group = pd.DataFrame({
+        "Fator de Risco": risk_counts.index.str.replace('_', ' ').str.title(),
+        "Casos com Presença": risk_counts.values,
+        "Percentual (%)": percentuais.values
+    })
+
+    fig = px.bar(
+        df_group,
+        x="Percentual (%)",
+        y="Fator de Risco",
+        orientation="h",
+        color_discrete_sequence=[color],
+        template="simple_white",
+        text=df_group["Percentual (%)"].apply(lambda x: f"{x:.1f}%"),
+        title=title
+    )
+
+    fig.update_layout(yaxis=dict(categoryorder='total ascending'))
+    fig.update_traces(textposition="outside")
+    st.plotly_chart(fig, use_container_width=True)
+
+# Estilo de Vida
+plot_group("Estilo de Vida", [
+    "tobacco_use", "alcohol_consumption", "betel_quid_use", "diet_fruits_vegetables_intake"
+], "#636EFA")
+
+# Biológicos
+plot_group("Fatores Biológicos", [
+    "hpv_infection", "compromised_immune_system", "family_history_of_cancer"
+], "#EF553B")
+
+# Ambientais
+plot_group("Exposição Ambiental", [
+    "chronic_sun_exposure", "poor_oral_hygiene"
+], "#00CC96")
+
+# Clínicos
+plot_group("Sinais Clínicos", [
+    "oral_lesions", "unexplained_bleeding", "difficulty_swallowing", "white_or_red_patches_in_mouth"
+], "#AB63FA")
+
+'''
+st.subheader("Análise por Grupos de Fatores de Risco")
+
+def plot_group(title, factor_list, color):
     risk_counts = df_filtered[factor_list].apply(lambda col: (col == "Yes").sum()).sort_values()
     df_group = pd.DataFrame({
         "Fator de Risco": risk_counts.index,
@@ -186,5 +235,5 @@ plot_group("Sinais Clínicos", [
     "oral_lesions", "unexplained_bleeding", "difficulty_swallowing", "white_or_red_patches_in_mouth"
 ], "#AB63FA")
 
-
+'''
 
