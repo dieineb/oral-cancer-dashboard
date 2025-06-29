@@ -14,7 +14,7 @@ def load_data():
     return df
 
 df = load_data()
-
+'''
 # ===============================
 # Filtros laterais 
 # ===============================
@@ -38,6 +38,71 @@ if selected_gender != "Todos":
     df_filtered = df_filtered[df_filtered["gender"] == selected_gender]
 if selected_country != "Todos":
     df_filtered = df_filtered[df_filtered["country"] == selected_country]
+'''
+
+# ===============================
+# Filtros laterais 
+# ===============================
+with st.sidebar:
+    st.header("Filtros")
+    st.markdown("Selecione os critérios para refinar os dados:")
+
+    # Filtro por sexo
+    selected_gender = st.selectbox(
+        "Sexo",
+        options=["Todos"] + sorted(df["gender"].dropna().unique().tolist())
+    )
+
+    # Filtro por país
+    selected_country = st.selectbox(
+        "País",
+        options=["Todos"] + sorted(df["country"].dropna().unique().tolist())
+    )
+
+    # Novo: Filtro por faixa etária (faixas fixas)
+    age_ranges = {
+        "20-40": (20, 40),
+        "41-60": (41, 60),
+        "61-80": (61, 80),
+        "81+": (81, 120)
+    }
+    selected_age_ranges = st.multiselect(
+        "Faixa Etária",
+        options=list(age_ranges.keys()),
+        default=list(age_ranges.keys())
+    )
+
+    # Novo: Filtro por estágio do câncer
+    available_stages = df["cancer_stage"].dropna().unique().tolist()
+    selected_stages = st.multiselect(
+        "Estágio do Câncer",
+        options=available_stages,
+        default=available_stages
+    )
+# ===============================
+# Aplicar filtros
+# ===============================
+df_filtered = df.copy()
+
+# Filtro por sexo
+if selected_gender != "Todos":
+    df_filtered = df_filtered[df_filtered["gender"] == selected_gender]
+
+# Filtro por país
+if selected_country != "Todos":
+    df_filtered = df_filtered[df_filtered["country"] == selected_country]
+
+# Filtro por estágio do câncer
+if selected_stages:
+    df_filtered = df_filtered[df_filtered["cancer_stage"].isin(selected_stages)]
+
+# Filtro por faixa etária
+if selected_age_ranges:
+    age_mask = pd.Series(False, index=df_filtered.index)
+    for faixa in selected_age_ranges:
+        min_age, max_age = age_ranges[faixa]
+        age_mask |= (df_filtered["age"] >= min_age) & (df_filtered["age"] <= max_age)
+    df_filtered = df_filtered[age_mask]
 
 # ===============================
 # Título
@@ -204,50 +269,4 @@ plot_group("Sinais Clínicos", [
     "oral_lesions", "unexplained_bleeding", "difficulty_swallowing", "white_or_red_patches_in_mouth"
 ], "#AB63FA")
 
-# ===============================
-# Filtros interativos
-# ===============================
-st.sidebar.header("Filtros")
 
-# Filtro por sexo e país já existente
-selected_gender = st.sidebar.multiselect("Sexo", options=df["gender"].unique(), default=df["gender"].unique())
-selected_country = st.sidebar.multiselect("País", options=df["country"].unique(), default=df["country"].unique())
-
-# Novo: Filtro por faixa etária
-age_ranges = {
-    "20-40": (20, 40),
-    "41-60": (41, 60),
-    "61-80": (61, 80),
-    "81+": (81, 120)
-}
-selected_ranges = st.sidebar.multiselect("Faixa Etária", options=list(age_ranges.keys()), default=list(age_ranges.keys()))
-selected_stages = st.sidebar.multiselect("Estágio do câncer", options=df["cancer_stage"].dropna().unique(), default=df["cancer_stage"].dropna().unique())
-
-# Aplicar os filtros
-filtered_df = df[
-    (df["gender"].isin(selected_gender)) &
-    (df["country"].isin(selected_country)) &
-    (df["cancer_stage"].isin(selected_stages))
-]
-
-# Aplicar filtro de faixa etária
-age_filter = pd.Series(False, index=filtered_df.index)
-for faixa in selected_ranges:
-    min_age, max_age = age_ranges[faixa]
-    age_filter |= (filtered_df["age"] >= min_age) & (filtered_df["age"] <= max_age)
-filtered_df = filtered_df[age_filter]
-
-# ===============================
-# Gráfico de dispersão: Idade vs. Taxa de Sobrevivência
-# ===============================
-st.markdown("### Gráfico de Dispersão: Idade vs. Taxa de Sobrevivência")
-fig = px.scatter(
-    filtered_df,
-    x="age",
-    y="survival_rate_5_year_pct",
-    color="cancer_stage",
-    hover_data=["gender", "country"],
-    labels={"age": "Idade", "survival_rate_5_year_pct": "Taxa de Sobrevivência (5 anos %)", "cancer_stage": "Estágio"},
-    title="Dispersão: Idade x Taxa de Sobrevivência por Estágio"
-)
-st.plotly_chart(fig, use_container_width=True)
