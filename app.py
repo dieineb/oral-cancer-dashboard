@@ -3,9 +3,6 @@ import pandas as pd
 import plotly.express as px
 from io import StringIO
 
-# ===============================
-# Carregar e padronizar os dados
-# ===============================
 @st.cache_data
 def load_data():
     df = pd.read_csv("oral_cancer_prediction_dataset.csv")
@@ -17,37 +14,35 @@ def load_data():
 df = load_data()
 
 # ===============================
-# Filtros laterais 
+# Filtros laterais com multiselect
 # ===============================
 with st.sidebar:
     st.header("Filtros")
     st.markdown("Selecione os critérios para refinar os dados:")
 
-    selected_gender = st.selectbox(
+    selected_gender = st.multiselect(
         "Sexo",
-        options=["Todos"] + sorted(df["gender"].dropna().unique().tolist())
+        options=sorted(df["gender"].dropna().unique()),
+        default=sorted(df["gender"].dropna().unique())
     )
 
-    selected_country = st.selectbox(
+    selected_country = st.multiselect(
         "País",
-        options=["Todos"] + sorted(df["country"].dropna().unique().tolist())
+        options=sorted(df["country"].dropna().unique()),
+        default=sorted(df["country"].dropna().unique())
     )
 
 # Aplicar filtros
-df_filtered = df.copy()
-if selected_gender != "Todos":
-    df_filtered = df_filtered[df_filtered["gender"] == selected_gender]
-if selected_country != "Todos":
-    df_filtered = df_filtered[df_filtered["country"] == selected_country]
+df_filtered = df[
+    (df["gender"].isin(selected_gender)) &
+    (df["country"].isin(selected_country))
+]
 
 # ===============================
-# Título
+# Título e métricas
 # ===============================
 st.title("Dashboard de Predição de Câncer Oral")
 
-# ===============================
-# Exibir métricas no topo
-# ===============================
 total_registros = df_filtered.shape[0]
 media_idade = df_filtered["age"].mean()
 num_paises = df_filtered["country"].nunique()
@@ -58,17 +53,34 @@ col2.metric("Idade Média", f"{media_idade:.1f} anos")
 col3.metric("Países Representados", num_paises)
 
 # ===============================
-# Layout com abas
+# Abas
 # ===============================
 tabs = st.tabs(["Visão Geral", "Visualizações", "Mapa"])
 
 # === Aba 1: Visão Geral ===
 with tabs[0]:
-    st.markdown(
-        "Este painel permite explorar dados relacionados ao câncer oral com base em fatores de risco, "
-        "diagnóstico e taxas de sobrevivência. Os dados podem ser filtrados pela barra lateral."
-    )
-    st.dataframe(df_filtered.head(10))
+    st.markdown("Esta aba apresenta um resumo estatístico dos dados filtrados.")
+
+    st.subheader("Distribuição por Sexo")
+    sexo_counts = df_filtered["gender"].value_counts().reset_index()
+    sexo_counts.columns = ["Sexo", "Total"]
+    fig_sexo = px.pie(sexo_counts, names="Sexo", values="Total", hole=0.4)
+    st.plotly_chart(fig_sexo)
+
+    st.subheader("Diagnóstico (Healthy x Cancer)")
+    diag_counts = df_filtered["oral_cancer_diagnosis"].value_counts().reset_index()
+    diag_counts.columns = ["Diagnóstico", "Total"]
+    fig_diag_resumo = px.bar(diag_counts, x="Diagnóstico", y="Total", color="Diagnóstico")
+    st.plotly_chart(fig_diag_resumo)
+
+    st.subheader("Estágios do Câncer Oral")
+    stage_counts = df_filtered["cancer_stage"].value_counts().reset_index()
+    stage_counts.columns = ["Estágio", "Casos"]
+    fig_stage_resumo = px.bar(stage_counts, x="Estágio", y="Casos", color="Estágio")
+    st.plotly_chart(fig_stage_resumo)
+
+    with st.expander("Visualizar tabela de dados filtrados"):
+        st.dataframe(df_filtered.reset_index(drop=True))
 
 # === Aba 2: Visualizações ===
 with tabs[1]:
@@ -119,6 +131,27 @@ with tabs[1]:
     )
     st.plotly_chart(fig_surv)
 
+    st.subheader("Distribuição dos Fatores de Risco")
+    fatores_binarios = [
+        "tobacco_use", "alcohol_consumption", "hpv_infection",
+        "betel_quid_use", "chronic_sun_exposure", "poor_oral_hygiene",
+        "family_history_of_cancer", "compromised_immune_system"
+    ]
+    percentuais = df_filtered[fatores_binarios].mean().sort_values(ascending=False) * 100
+    df_risco = pd.DataFrame({
+        "Fator de Risco": percentuais.index.str.replace("_", " ").str.title(),
+        "Porcentagem": percentuais.values
+    })
+    fig_risco = px.bar(
+        df_risco,
+        x="Fator de Risco",
+        y="Porcentagem",
+        title="Prevalência dos Fatores de Risco",
+        labels={"Porcentagem": "% de Presença"}
+    )
+    fig_risco.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig_risco)
+
 # === Aba 3: Mapa ===
 with tabs[2]:
     st.subheader("Distribuição Geográfica dos Casos")
@@ -153,6 +186,5 @@ with tabs[2]:
     )
 
     st.plotly_chart(fig_map, use_container_width=True)
-
 
 
