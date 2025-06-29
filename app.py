@@ -27,6 +27,11 @@ with st.sidebar:
         options=["Todos"] + sorted(df["gender"].dropna().unique().tolist())
     )
     
+    selected_country = st.selectbox(
+        "País",
+        options=["Todos"] + sorted(df["country"].dropna().unique().tolist())
+    )
+    
 # Aplicar filtros
 df_filtered = df.copy()
 if selected_gender != "Todos":
@@ -265,9 +270,4 @@ fig_corr2 = px.scatter(
 )
 st.plotly_chart(fig_corr2)
 
-
-    selected_country = st.selectbox(
-        "País",
-        options=["Todos"] + sorted(df["country"].dropna().unique().tolist())
-    )
 
