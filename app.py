@@ -8,6 +8,8 @@ import plotly.express as px
 @st.cache_data
 def load_data():
     df = pd.read_csv("oral_cancer_prediction_dataset.csv")
+    st.write(df.columns.tolist())
+
     return df
 
 df = load_data()
