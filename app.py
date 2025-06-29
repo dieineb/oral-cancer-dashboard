@@ -20,41 +20,54 @@ df = load_data()
 # Filtros laterais 
 # ===============================
 with st.sidebar:
-    st.header("Filtros disponíveis")
-    st.markdown("Utilize os filtros abaixo para refinar os dados exibidos no dashboard:")
+    st.header("Filtros")
+    st.markdown("Selecione os critérios para refinar os dados:")
 
-    selected_gender = st.multiselect(
+    selected_gender = st.selectbox(
         "Sexo",
-        options=df["gender"].dropna().unique(),
-        default=df["gender"].dropna().unique()
+        options=["Todos"] + sorted(df["gender"].dropna().unique().tolist())
     )
 
-    selected_country = st.multiselect(
+    selected_country = st.selectbox(
         "País",
-        options=df["country"].dropna().unique(),
-        default=df["country"].dropna().unique()
+        options=["Todos"] + sorted(df["country"].dropna().unique().tolist())
     )
 
 # Aplicar filtros
-df_filtered = df[
-    (df["gender"].isin(selected_gender)) &
-    (df["country"].isin(selected_country))
-]
+df_filtered = df.copy()
+if selected_gender != "Todos":
+    df_filtered = df_filtered[df_filtered["gender"] == selected_gender]
+if selected_country != "Todos":
+    df_filtered = df_filtered[df_filtered["country"] == selected_country]
+
+# ===============================
+# Título
+# ===============================
+st.title("Dashboard de Predição de Câncer Oral")
+
+# ===============================
+# Exibir métricas no topo
+# ===============================
+total_registros = df_filtered.shape[0]
+media_idade = df_filtered["age"].mean()
+num_paises = df_filtered["country"].nunique()
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Total de Registros", total_registros)
+col2.metric("Idade Média", f"{media_idade:.1f} anos")
+col3.metric("Países Representados", num_paises)
 
 # ===============================
 # Layout com abas
 # ===============================
-st.title("Dashboard de Predição de Câncer Oral")
-
 tabs = st.tabs(["Visão Geral", "Visualizações", "Mapa"])
 
 # === Aba 1: Visão Geral ===
 with tabs[0]:
-    st.markdown("""
-    Este painel interativo permite explorar dados relacionados ao câncer oral com base em fatores de risco,
-    diagnóstico e taxas de sobrevivência.  
-    Utilize os filtros na barra lateral para refinar os dados apresentados.
-    """)
+    st.markdown(
+        "Este painel permite explorar dados relacionados ao câncer oral com base em fatores de risco, "
+        "diagnóstico e taxas de sobrevivência. Os dados podem ser filtrados pela barra lateral."
+    )
     st.dataframe(df_filtered.head(10))
 
 # === Aba 2: Visualizações ===
@@ -119,7 +132,7 @@ with tabs[2]:
         locationmode="country names",
         color="cases",
         hover_name="country",
-        color_continuous_scale="Viridis",
+        color_continuous_scale="Tealgrn",
         title="Distribuição Global de Casos de Câncer Oral",
         template="plotly_white",
         projection="natural earth"
@@ -140,5 +153,6 @@ with tabs[2]:
     )
 
     st.plotly_chart(fig_map, use_container_width=True)
+
 
 
