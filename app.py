@@ -41,8 +41,8 @@ st.subheader("Idade vs Taxa de Sobrevivência")
 fig2 = px.scatter(
     df_filtered,
     x="age",
-    y="survival_rate_5_year_pct",
-    color="oral_cancer_diagnosis",
+    y="survival_rate_5_year_%",
+    color="oral_cancer_(diagnosis)",
     hover_data=["country", "gender"],
     title="Idade vs Taxa de Sobrevivência (5 anos)"
 )
