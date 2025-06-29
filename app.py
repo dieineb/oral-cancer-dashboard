@@ -46,7 +46,7 @@ country_counts = df_filtered["country"].value_counts().reset_index()
 country_counts.columns = ["country", "count"]
 fig1 = px.bar(country_counts, x="country", y="count", title="Casos por País", color="count")
 st.plotly_chart(fig1)
-
+'''
 # Gráfico: Idade vs Sobrevivência
 st.subheader("Idade vs Taxa de Sobrevivência")
 fig2 = px.scatter(
@@ -58,7 +58,7 @@ fig2 = px.scatter(
     title="Idade vs Taxa de Sobrevivência (5 anos)"
 )
 st.plotly_chart(fig2)
-
+'''
 # Mapa: Casos por País
 st.subheader("Mapa Interativo: Casos por País")
 fig3 = px.choropleth(
