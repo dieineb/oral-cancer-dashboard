@@ -145,6 +145,46 @@ fig_map.update_layout(
 
 st.plotly_chart(fig_map, use_container_width=True)
 
+st.subheader("Análise por Grupos de Fatores de Risco")
+
+def plot_group(title, factor_list, color):
+    risk_counts = df_filtered[factor_list].apply(lambda col: (col == "Yes").sum()).sort_values()
+    df_group = pd.DataFrame({
+        "Fator de Risco": risk_counts.index,
+        "Casos com Presença": risk_counts.values
+    })
+
+    fig = px.bar(
+        df_group,
+        x="Casos com Presença",
+        y="Fator de Risco",
+        orientation="h",
+        color_discrete_sequence=[color],
+        template="simple_white",
+        title=title
+    )
+    fig.update_layout(yaxis=dict(categoryorder='total ascending'))
+    st.plotly_chart(fig)
+
+# Estilo de Vida
+plot_group("Estilo de Vida", [
+    "tobacco_use", "alcohol_consumption", "betel_quid_use", "diet_fruits_vegetables_intake"
+], "#636EFA")
+
+# Biológicos
+plot_group("Fatores Biológicos", [
+    "hpv_infection", "compromised_immune_system", "family_history_of_cancer"
+], "#EF553B")
+
+# Ambientais
+plot_group("Exposição Ambiental", [
+    "chronic_sun_exposure", "poor_oral_hygiene"
+], "#00CC96")
+
+# Clínicos
+plot_group("Sinais Clínicos", [
+    "oral_lesions", "unexplained_bleeding", "difficulty_swallowing", "white_or_red_patches_in_mouth"
+], "#AB63FA")
 
 
 
