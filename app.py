@@ -63,7 +63,7 @@ st.subheader("Distribuição dos Diagnósticos de Câncer Oral")
 fig_diag = px.histogram(
     df_filtered,
     x="oral_cancer_diagnosis",
-    color_discrete_sequence=["#636EFA"],
+    color="oral_cancer_diagnosis",
     title="Diagnóstico",
     labels={"oral_cancer_diagnosis": "Diagnóstico"},
     template="simple_white"
@@ -74,7 +74,7 @@ st.subheader("Distribuição por Estágio do Câncer")
 fig_stage = px.histogram(
     df_filtered,
     x="cancer_stage",
-    color_discrete_sequence=["#EF553B"],
+    color="cancer_stage",
     title="Estágios do Câncer Oral",
     labels={"cancer_stage": "Estágio"},
     template="simple_white"
@@ -86,7 +86,7 @@ fig_surv = px.box(
     df_filtered,
     x="gender",
     y="survival_rate_5_year_pct",
-    color_discrete_sequence=["#AB63FA"],
+    color="gender",
     title="Taxa de Sobrevivência por Sexo",
     labels={"survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
     template="simple_white"
@@ -101,7 +101,7 @@ fig_age = px.scatter(
     df_age_plot,
     x="age",
     y="survival_rate_5_year_pct",
-    color_discrete_sequence=["#00CC96"],
+    color="cancer_stage",
     title="Taxa de Sobrevivência por Idade",
     labels={"age": "Idade", "survival_rate_5_year_pct": "Taxa de Sobrevivência (%)"},
     template="simple_white"
@@ -122,7 +122,7 @@ fig_map = px.choropleth(
     locationmode="country names",
     color="cases",
     hover_name="country",
-    color_continuous_scale="GnBu",
+    color_continuous_scale="Blues",
     template="simple_white",
     projection="natural earth",
     title="Distribuição Global de Casos de Câncer Oral",
