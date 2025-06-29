@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 from io import StringIO
@@ -153,7 +154,5 @@ with tabs[2]:
 
     st.plotly_chart(fig_map, use_container_width=True)
 
-
-        st.plotly_chart(fig_map, use_container_width=True)
 
 
