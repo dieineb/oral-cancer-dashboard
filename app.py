@@ -14,7 +14,7 @@ def load_data():
     return df
 
 df = load_data()
-'''
+
 # ===============================
 # Filtros laterais 
 # ===============================
@@ -38,71 +38,7 @@ if selected_gender != "Todos":
     df_filtered = df_filtered[df_filtered["gender"] == selected_gender]
 if selected_country != "Todos":
     df_filtered = df_filtered[df_filtered["country"] == selected_country]
-'''
 
-# ===============================
-# Filtros laterais 
-# ===============================
-with st.sidebar:
-    st.header("Filtros")
-    st.markdown("Selecione os critérios para refinar os dados:")
-
-    # Filtro por sexo
-    selected_gender = st.selectbox(
-        "Sexo",
-        options=["Todos"] + sorted(df["gender"].dropna().unique().tolist())
-    )
-
-    # Filtro por país
-    selected_country = st.selectbox(
-        "País",
-        options=["Todos"] + sorted(df["country"].dropna().unique().tolist())
-    )
-
-    # Novo: Filtro por faixa etária (faixas fixas)
-    age_ranges = {
-        "20-40": (20, 40),
-        "41-60": (41, 60),
-        "61-80": (61, 80),
-        "81+": (81, 120)
-    }
-    selected_age_ranges = st.multiselect(
-        "Faixa Etária",
-        options=list(age_ranges.keys()),
-        default=list(age_ranges.keys())
-    )
-
-    # Novo: Filtro por estágio do câncer
-    available_stages = df["cancer_stage"].dropna().unique().tolist()
-    selected_stages = st.multiselect(
-        "Estágio do Câncer",
-        options=available_stages,
-        default=available_stages
-    )
-# ===============================
-# Aplicar filtros
-# ===============================
-df_filtered = df.copy()
-
-# Filtro por sexo
-if selected_gender != "Todos":
-    df_filtered = df_filtered[df_filtered["gender"] == selected_gender]
-
-# Filtro por país
-if selected_country != "Todos":
-    df_filtered = df_filtered[df_filtered["country"] == selected_country]
-
-# Filtro por estágio do câncer
-if selected_stages:
-    df_filtered = df_filtered[df_filtered["cancer_stage"].isin(selected_stages)]
-
-# Filtro por faixa etária
-if selected_age_ranges:
-    age_mask = pd.Series(False, index=df_filtered.index)
-    for faixa in selected_age_ranges:
-        min_age, max_age = age_ranges[faixa]
-        age_mask |= (df_filtered["age"] >= min_age) & (df_filtered["age"] <= max_age)
-    df_filtered = df_filtered[age_mask]
 
 # ===============================
 # Título
