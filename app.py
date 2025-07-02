@@ -228,7 +228,7 @@ color_map = {
     "surgery": "#5fa2dd",        # azul claro
     "radiation": "#2a5783",      # azul escuro
     "chemotherapy": "#4c72b0",   # azul padrão Plotly
-    "combined": "#9ecae1"        # azul bem claro
+    "targeted_therapy": "#9ecae1"        # azul bem claro
 }
 
 #Distribuição dos Tipos de Tratamento
