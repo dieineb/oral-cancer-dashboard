@@ -52,8 +52,8 @@ df_filtered["treatment_type"] = (
 # ===============================
 st.title("Dashboard: Câncer Bucal e Fatores de Risco")
 st.markdown(
-    "Este painel interativo permite explorar dados relacionados ao perfil dos pacientes, "
-    "fatores de risco, impacto econômico e desfechos clínicos associados ao câncer bucal."
+   "Este painel interativo permite explorar dados relacionados aos aspectos demográficos e clínicos associados ao câncer bucal, "
+   "incluindo fatores de risco, impacto econômico e desfechos da doença."
 )
 
 
