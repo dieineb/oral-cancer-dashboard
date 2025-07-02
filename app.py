@@ -259,6 +259,9 @@ fig_tt_cost = px.bar(
     },
     template="simple_white"
 )
+# Formatando o eixo y para mostrar valores em dólar
+fig_tt_cost.update_layout(yaxis_tickformat="$,.2f")
+st.plotly_chart(fig_tt_cost)
 st.plotly_chart(fig_tt_cost)
 
 st.subheader("Custo Médio por Faixa Etária")
@@ -282,6 +285,8 @@ fig_line_age_cost = px.line(
     markers=True,
     template="simple_white"
 )
+fig_line_age_cost.update_layout(yaxis_tickformat="$,.2f")
+st.plotly_chart(fig_line_age_cost)
 st.plotly_chart(fig_line_age_cost)
 
 # ===============================
