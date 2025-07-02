@@ -215,13 +215,12 @@ plot_group("Sinais Clínicos", [
 # ===============================
 st.subheader("Análise Econômica e Clínica dos Tratamentos")
 
-# Mapeamento fixo de cores
 color_map = {
-    "no_treatment": "#636EFA",  # azul
-    "surgery": "#EF553B",       # vermelho
-    "radiation": "#00CC96",     # verde
-    "chemotherapy": "#AB63FA",  # roxo
-    "combined": "#FFA15A"       # laranja
+    "no_treatment": "#1f77b4",   # azul médio
+    "surgery": "#5fa2dd",        # azul claro
+    "radiation": "#2a5783",      # azul escuro
+    "chemotherapy": "#4c72b0",   # azul padrão Plotly
+    "combined": "#9ecae1"        # azul bem claro
 }
 
 #Distribuição dos Tipos de Tratamento
