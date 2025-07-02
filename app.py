@@ -82,7 +82,7 @@ fig_stage = px.histogram(
     color="cancer_stage",
     title="Estágios do Câncer Oral",
     labels={"cancer_stage": "Estágio"},
-    template="simple_white"
+    template="simple_white",
     category_orders={"cancer_stage": [0, 1, 2, 3, 4]}
 )
 st.plotly_chart(fig_stage)
