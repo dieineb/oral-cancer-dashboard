@@ -222,7 +222,7 @@ color_map = {
     "radiation": "#00CC96",     # verde
     "chemotherapy": "#AB63FA",  # roxo
     "combined": "#FFA15A"       # laranja
-
+}
 
 #Distribuição dos Tipos de Tratamento
 fig_tt = px.histogram(
