@@ -39,6 +39,14 @@ if selected_gender != "Todos":
 if selected_country != "Todos":
     df_filtered = df_filtered[df_filtered["country"] == selected_country]
 
+# Normalização dos valores da coluna treatment_type
+df_filtered["treatment_type"] = (
+    df_filtered["treatment_type"]
+    .str.strip()
+    .str.lower()
+    .str.replace(" ", "_")
+)
+
 # ===============================
 # Título
 # ===============================
