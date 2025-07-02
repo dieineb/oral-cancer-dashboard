@@ -42,7 +42,12 @@ if selected_country != "Todos":
 # ===============================
 # Título
 # ===============================
-st.title("Dashboard de Predição de Câncer Oral")
+st.title("Dashboard: Câncer Bucal e Fatores de Risco")
+st.markdown(
+    "Este painel interativo permite explorar dados relacionados ao perfil dos pacientes, "
+    "fatores de risco, impacto econômico e desfechos clínicos associados ao câncer bucal."
+)
+
 
 # ===============================
 # Exibir métricas no topo
@@ -78,6 +83,7 @@ fig_stage = px.histogram(
     title="Estágios do Câncer Oral",
     labels={"cancer_stage": "Estágio"},
     template="simple_white"
+    category_orders={"cancer_stage": [0, 1, 2, 3, 4]}
 )
 st.plotly_chart(fig_stage)
 
@@ -209,11 +215,21 @@ plot_group("Sinais Clínicos", [
 # ===============================
 st.subheader("Análise Econômica e Clínica dos Tratamentos")
 
+# Mapeamento fixo de cores
+color_map = {
+    "no_treatment": "#636EFA",  # azul
+    "surgery": "#EF553B",       # vermelho
+    "radiation": "#00CC96",     # verde
+    "chemotherapy": "#AB63FA",  # roxo
+    "combined": "#FFA15A"       # laranja
+
+
 #Distribuição dos Tipos de Tratamento
 fig_tt = px.histogram(
     df_filtered,
     x="treatment_type",
     color="treatment_type",
+    color_discrete_map=color_map,
     title="Tipos de Tratamento",
     labels={"treatment_type": "Tipo de Tratamento"},
     template="simple_white"
@@ -228,6 +244,7 @@ fig_tt_cost = px.bar(
     x="treatment_type",
     y="cost_of_treatment_usd",
     color="treatment_type",
+    color_discrete_map=color_map,
     title="Custo Médio (USD) por Tipo de Tratamento",
     labels={
         "cost_of_treatment_usd": "Custo Médio (USD)",
@@ -241,8 +258,8 @@ st.subheader("Custo Médio por Faixa Etária")
 
 # Criar faixas etárias
 df_age_cost = df_filtered.dropna(subset=["age", "cost_of_treatment_usd"])
-df_age_cost["faixa_etaria"] = pd.cut(df_age_cost["age"], bins=[0, 30, 45, 60, 75, 90, 120],
-                                     labels=["0-30", "31-45", "46-60", "61-75", "76-90", "91+"])
+df_age_cost["faixa_etaria"] = pd.cut(df_age_cost["age"], bins=[15, 30, 45, 60, 75, 90, 120],
+                                     labels=["15-30", "31-45", "46-60", "61-75", "76-90", "91+"])
 
 df_avg_cost_age = df_age_cost.groupby("faixa_etaria")["cost_of_treatment_usd"].mean().reset_index()
 
